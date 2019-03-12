@@ -7,8 +7,8 @@ module OmniAuth
 
       option :client_options,
              site: 'https://www.mindmeister.com',
-             authorize_url: 'https://www.mindmeister.com/oauth2/authorize',
-             token_url: 'https://www.mindmeister.com/oauth2/token'
+             authorize_url: '/oauth2/authorize',
+             token_url: '/oauth2/token'
 
       uid { raw_info['id'] }
 
@@ -21,6 +21,11 @@ module OmniAuth
 
       extra do
         { raw_info: raw_info }
+      end
+
+      def build_access_token
+        verifier = request.params['code']
+        client.auth_code.get_token(verifier, { redirect_uri: callback_url, client_id: options.client_id, client_secret: options.client_secret }.merge(token_params.to_hash(symbolize_keys: true)), deep_symbolize(options.auth_token_params))
       end
 
       def raw_info
