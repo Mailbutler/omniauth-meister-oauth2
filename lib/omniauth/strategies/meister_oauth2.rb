@@ -29,17 +29,13 @@ module OmniAuth
 
       def build_access_token
         verifier = request.params['code']
-        client.auth_code.get_token(verifier, { redirect_uri: callback_url, client_id: options.client_id, client_secret: options.client_secret, scopes: options.scope }.merge(token_params.to_hash(symbolize_keys: true)), deep_symbolize(options.auth_token_params))
+
+        params = { redirect_uri: callback_url, client_id: options.client_id, client_secret: options.client_secret, scopes: options.scope }
+        client.auth_code.get_token(verifier, params.merge(token_params.to_hash(symbolize_keys: true)), deep_symbolize(options.auth_token_params))
       end
 
       def raw_info
-        log(:info, access_token.to_hash)
         @raw_info ||= access_token.get('https://www.mindmeister.com/api/v2/users/me').parsed
-        log(:info, @raw_profile_info)
-        @raw_profile_info
-      rescue StandardError => e
-        log(:error, e)
-        raise
       end
     end
   end
